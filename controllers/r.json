@@ -1,0 +1,38 @@
+{
+  "files_and_join_info": {
+    "primary_file": {
+      "Filename": "data1.csv",
+      "Join_columns": [
+        "id"
+      ]
+    },
+    "secondary_files": [
+      {
+        "File name": "data2.csv",
+        "Join_columns": [
+          "roll"
+        ],
+        "join_type": "inner"
+      }
+    ]
+  },
+  "filter": [
+    {
+      "fileName": "data1.csv",
+      "conditions": {
+        "Expressions": [
+          "id > 2","id < 6"
+        ],
+        "operator": "And"
+      }
+    },
+    {
+      "fileName": "data2.csv",
+      "conditions": {
+        "Expressions": [
+          "roll > 2"
+        ]
+      }
+    }
+  ]
+}

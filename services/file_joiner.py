@@ -2,7 +2,7 @@ import polars as pl
 from models.schemas import PrimaryFile, JoinFile
 from utils.logger import logger
 
-from typing import List
+from typing import List,Dict
 
 
 def make_join_statement(left_join_cols: List[str], right_join_cols: List[str]) -> str:
@@ -17,7 +17,7 @@ def make_join_statement(left_join_cols: List[str], right_join_cols: List[str]) -
             join_string += " and "
     return join_string
 
-def join_files(df_map: dict, primary_info: PrimaryFile, secondary_files: list[JoinFile]) -> pl.DataFrame:
+def join_files(df_map: Dict[str,pl.DataFrame], primary_info: PrimaryFile, secondary_files: list[JoinFile]) -> pl.DataFrame:
     try:
         # Clear any previous context (optional but safe in long-running apps)
         # pl.sql.clear()

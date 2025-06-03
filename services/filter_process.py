@@ -28,7 +28,7 @@ def apply_filters(df: pl.DataFrame, conditions: FilterConditions) -> pl.DataFram
             raise ValueError("Invalid operator for multiple expressions")
 
     except Exception as e:
-        logger.error(f"Error applying filters: {e}", exc_info=True)
+        logger.error(f"Error applying filters: {e}")
         raise
 
 

@@ -44,6 +44,9 @@ class FilterConditions(BaseModel):
 
     model_config = {"populate_by_name" : True}
 
+class ConvertCondition(BaseModel):
+    column_name: str
+    format: str
 
 class Filter(BaseModel):
     file_name: str = Field(..., alias="fileName")

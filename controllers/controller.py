@@ -41,12 +41,17 @@ def process_files(request: InputModel):
         # logger.info(df_map)
 
 
-        file_join_start_time = time.time()
-        final_processed_df = join_files(df_map,request.files_and_join_info.primary_file,request.files_and_join_info.secondary_files)
-        file_join_end_time = time.time()
-        total_file_join_time = file_join_end_time - file_join_start_time
-        logger.info(f"Time taken to join the file: {total_file_join_time}")
-        final_processed_df.collect().write_csv(getFullOutputPath())
+        if request.files_and_join_info.secondary_files:
+            file_join_start_time = time.time()
+            final_processed_df = join_files(df_map,request.files_and_join_info.primary_file,request.files_and_join_info.secondary_files)
+            file_join_end_time = time.time()
+            total_file_join_time = file_join_end_time - file_join_start_time
+            logger.info(f"Time taken to join the file: {total_file_join_time}")
+            final_processed_df.collect().write_csv(getFullOutputPath())
+
+        else:
+            final_processed_df = df_map[primary_file]
+            final_processed_df.write_csv(getFullOutputPath())
 
         # logger.info(final_processed_df)
         

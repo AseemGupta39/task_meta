@@ -30,10 +30,13 @@ def file_append(request:InputModel) -> InputModel:
     if filter_conditions is not None:
         for i in filter_conditions:
             filename = i.file_name.split('.')[0]
+            if i.convert_condition is not None:
+                i.convert_condition.column_name = filename + connector +i.convert_condition.column_name
+                logger.easyPrint(i.convert_condition.column_name)
             expression = i.conditions.expressions
             for j in range(len(expression)):
                 expression[j] = filename + connector +expression[j]
-                logger.info(expression[j])
+                # logger.info(expression[j])
         request.filter = filter_conditions
 
     # logger.info(request.filter)

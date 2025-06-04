@@ -32,12 +32,14 @@ def process_files(request: InputModel):
         try:
             if request.filter:
                 file_filter_start_time = time.time()
+                logger.info(f"\n\n\n{request.filter}\n\n\n")
+
                 for file_details in request.filter:
                     filter_file_name = file_details.file_name
                     if(filter_file_name not in df_map):
                         logger.error(" This file is not in join files ")
                         raise HTTPException(status_code=404,detail="Error occurred as file is not in join files list.")
-                    df_map[filter_file_name] = apply_filters(df_map[filter_file_name],file_details.conditions)
+                    df_map[filter_file_name] = apply_filters(df_map[filter_file_name],file_details.conditions,file_details.convert_condition)
                 file_filter_end_time = time.time()
                 total_file_filter_time = file_filter_end_time - file_filter_start_time
                 logger.info(f"Time taken to filter the file: {total_file_filter_time}")

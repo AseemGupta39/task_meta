@@ -30,5 +30,7 @@ class TerminalLogger:
     def warning(self, message): self._log("WARNING", message)
     def error(self, message): self._log("ERROR", message)
 
+    def easyPrint(self, message): self.info(f"\n\n\n\n{message}\n\n\n\n")
+
 
 logger = TerminalLogger("MyApp")

@@ -32,7 +32,7 @@ def process_files(request: InputModel):
         try:
             if request.filter:
                 file_filter_start_time = time.time()
-                logger.info(f"\n\n\n{request.filter}\n\n\n")
+                # logger.info(f"\n\n\n{request.filter}\n\n\n")
 
                 for file_details in request.filter:
                     filter_file_name = file_details.file_name

@@ -14,7 +14,6 @@ load_dotenv()
 INPUT_DIR = os.environ.get("INPUT_DIR")
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR")
 
-print(INPUT_DIR,"first")
 INPUT_DIR = Path(INPUT_DIR)
 OUTPUT_DIR = Path(OUTPUT_DIR)
 OUTPUT_FILENAME = os.environ.get("OUTPUT_FILENAME")
@@ -30,6 +29,3 @@ def getFullInputPath(FileName):
 def getFullOutputPath():
     return OUTPUT_DIR / OUTPUT_FILENAME
 
-logger.info(f"input dir is {INPUT_DIR}")
-
-# print(getFullInputPath("data1.csv"))

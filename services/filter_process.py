@@ -1,10 +1,14 @@
 import polars as pl
 from models.schemas import FilterConditions
 from utils.logger import logger
+from models.schemas import ConvertCondition
 
-
-def apply_filters(df: pl.DataFrame, conditions: FilterConditions) -> pl.DataFrame:
+def apply_filters(df: pl.DataFrame, conditions: FilterConditions, convert_condition: ConvertCondition = None) -> pl.DataFrame:
     try:
+        # Apply datetime conversion if needed
+        if convert_condition:
+            df = convert_column_to_datetime(df, convert_condition)
+            
         expressions = conditions.expressions
         operator = conditions.operator
 
@@ -48,14 +52,25 @@ def parse_expression(expr: str) -> pl.Expr:
     column = column.strip()
     value = value.strip().strip('"').strip("'")
 
+    # try:
+    #     # Try converting value to a number
+    #     if "." in value:
+    #         value = float(value)
+    #     else:
+    #         value = int(value)
+    # except ValueError:
+    #     # Leave value as string
+    #     pass
+    
     try:
-        # Try converting value to a number
-        if "." in value:
+        if "-" in value or "/" in value:
+            from datetime import datetime
+            value = pl.lit(pl.DateTime(datetime.fromisoformat(value)))
+        elif "." in value:
             value = float(value)
         else:
             value = int(value)
     except ValueError:
-        # Leave value as string
         pass
 
     # Build the Polars expression
@@ -73,3 +88,11 @@ def parse_expression(expr: str) -> pl.Expr:
         return pl.col(column) <= value
     else:
         raise ValueError(f"Unsupported operator: '{op}'")
+    
+
+def convert_column_to_datetime(df: pl.DataFrame, convert_condition: ConvertCondition) -> pl.DataFrame:
+    column = convert_condition.column_name
+    fmt = convert_condition.format
+    return df.with_columns(
+        pl.col(column).str.strptime(pl.Datetime, fmt, strict=False)
+    )

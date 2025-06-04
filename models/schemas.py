@@ -50,6 +50,7 @@ class ConvertCondition(BaseModel):
 
 class Filter(BaseModel):
     file_name: str = Field(..., alias="fileName")
+    convert_condition: Optional[ConvertCondition] = None
     conditions: FilterConditions
 
     model_config = {"populate_by_name" : True}

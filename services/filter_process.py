@@ -1,10 +1,10 @@
 import polars as pl
 import re
-from models.schemas import FilterConditions
+from models.pydantic_models import FilterConditions
 from utils.logger import logger
-from models.schemas import ConvertCondition
+from models.pydantic_models import ConvertCondition
+from utils.constants import replacements, known_formats
 from datetime import datetime
-
 
 def apply_filters(df: pl.DataFrame, conditions: FilterConditions, convert_condition: ConvertCondition = None) -> pl.DataFrame:
     try:
@@ -369,6 +369,7 @@ def apply_filters(df: pl.DataFrame, conditions: FilterConditions, convert_condit
 
 '''
 
+# convertDatetimeColumn
 def convert_column_to_format(df: pl.DataFrame, convert_condition: ConvertCondition) -> pl.DataFrame:
     column = convert_condition.column_name
     user_format = convert_condition.format
@@ -408,16 +409,7 @@ def infer_format_from_string(date_str: str) -> str:
     Infer a datetime format from a sample date string.
     """
     # Examples of common formats — expand as needed
-    known_formats = [
-        "%Y-%m-%d",
-        "%d/%m/%Y",
-        "%m/%d/%Y",
-        "%Y/%m/%d",
-        "%d-%m-%Y",
-        "%y/%m/%d",
-        "%d-%b-%Y",
-        "%Y.%m.%d"
-    ]
+    
     for fmt in known_formats:
         try:
             datetime.strptime(date_str, fmt)
@@ -431,18 +423,6 @@ def convert_to_python_strftime(custom_format: str) -> str:
     """
     Convert user-provided format like 'yy/mm/dd' to Python strftime format.
     """
-    replacements = {
-        'yyyy': '%Y',
-        'yy': '%y',
-        'mm': '%m',
-        'dd': '%d',
-        'hh': '%H',
-        'mi': '%M',
-        'ss': '%S',
-        'mon': '%b',
-        'month': '%B',
-        'am/pm': '%p',
-    }
 
     python_format = custom_format.lower()
     for key, val in replacements.items():

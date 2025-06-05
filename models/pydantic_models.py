@@ -1,10 +1,16 @@
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field, model_validator
+from utils.constants import replacements
+from utils.date_validator import extract_date_tokens
+
+class DerivedColumn:
+    sql_statement: str
 
 class JoinFile(BaseModel):
     file_name: str = Field(..., alias="File name")
     join_columns: List[str] = Field(default_factory=list, alias="Join_columns")
     join_type: Optional[Literal["inner", "outer", "left", "right"]] = "outer"
+    derived_columns: Optional[List[DerivedColumn]]
 
     @model_validator(mode="after")
     def check_join_columns(self):
@@ -14,10 +20,10 @@ class JoinFile(BaseModel):
 
     model_config = {"populate_by_name" : True}
 
-
 class PrimaryFile(BaseModel):
     filename: str = Field(..., alias="Filename")
     join_columns: List[str] = Field(default_factory=list, alias="Join_columns")
+    derived_columns: Optional[List[DerivedColumn]]
 
     @model_validator(mode="after")
     def check_join_columns(self):
@@ -48,13 +54,20 @@ class ConvertCondition(BaseModel):
     column_name: str
     format: str
 
+    @model_validator(mode="after")
+    def check_valid_date(self):
+        try:
+            extract_date_tokens(self.format,replacements)
+            return self
+        except Exception as e:
+            raise ValueError(f"Invalid date format string: {self.format!r}. Error: {str(e)}")
+
 class Filter(BaseModel):
     file_name: str = Field(..., alias="fileName")
     convert_condition: Optional[ConvertCondition] = None
     conditions: FilterConditions
 
     model_config = {"populate_by_name" : True}
-
 
 class FilesAndJoinInfo(BaseModel):
     primary_file: PrimaryFile
@@ -67,7 +80,6 @@ class FilesAndJoinInfo(BaseModel):
         return self
 
     model_config = {"populate_by_name" : True}
-
 
 class InputModel(BaseModel):
     files_and_join_info: FilesAndJoinInfo

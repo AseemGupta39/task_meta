@@ -1,5 +1,5 @@
 import polars as pl
-from models.schemas import PrimaryFile, JoinFile
+from models.pydantic_models import PrimaryFile, JoinFile
 from utils.logger import logger
 from fastapi import HTTPException
 

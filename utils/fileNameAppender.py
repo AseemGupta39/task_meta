@@ -1,4 +1,4 @@
-from models.schemas import InputModel
+from models.pydantic_models import InputModel
 from utils.logger import logger
 
 def file_append(request:InputModel) -> InputModel:

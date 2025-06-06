@@ -1,19 +1,16 @@
 import polars as pl
 import re
-from models.pydantic_models import FilterConditions
+from models.pydantic_models import ConvertCondition, FilterConditions
 from utils.logger import logger
-from models.pydantic_models import ConvertCondition
 from utils.constants import replacements, known_formats
 from datetime import datetime
 
 def apply_filters(df: pl.DataFrame, conditions: FilterConditions, convert_condition: ConvertCondition = None) -> pl.DataFrame:
     try:
         # Apply datetime conversion if needed
-        logger.info(f"\n\n\n\n{convert_condition}\n\n\n\n")
+
         if convert_condition:
-            logger.info(f"\n\n\nBefore conversion: {df}\n\n\n")
             df = convert_column_to_format(df, convert_condition)
-            logger.info(f"\n\n\nAfter conversion: {df}\n\n\n")
         
         expressions = conditions.expressions
         operator = conditions.operator
@@ -374,7 +371,7 @@ def convert_column_to_format(df: pl.DataFrame, convert_condition: ConvertConditi
     column = convert_condition.column_name
     user_format = convert_condition.format
 
-    logger.easyPrint(f"Converting column '{column}' using target format '{user_format}'")
+    # logger.easyPrint(f"Converting column '{column}' using target format '{user_format}'")
 
     # Step 1: Infer original format from the first row
     example_value = df[column][0]
@@ -382,7 +379,7 @@ def convert_column_to_format(df: pl.DataFrame, convert_condition: ConvertConditi
     if not original_format:
         raise ValueError(f"Could not infer original format from value: {example_value}")
 
-    logger.easyPrint(f"Inferred original format: {original_format}")
+    # logger.easyPrint(f"Inferred original format: {original_format}")
 
     # Step 2: Convert user-provided format to Python datetime format
     python_target_format = convert_to_python_strftime(user_format)
@@ -396,11 +393,11 @@ def convert_column_to_format(df: pl.DataFrame, convert_condition: ConvertConditi
             .alias(column)
         )
     except Exception as e:
-        logger.easyPrint(f"Failed to convert and reformat datetime column '{column}': {e}")
+        logger.error(f"Failed to convert and reformat datetime column '{column}': {e}")
         raise
 
-    logger.easyPrint(f"Successfully reformatted '{column}' to format: {user_format}")
-    logger.easyPrint(df)
+    # logger.easyPrint(f"Successfully reformatted '{column}' to format: {user_format}")
+    # logger.easyPrint(df)
     return df
 
 

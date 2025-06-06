@@ -2,17 +2,13 @@ from models.pydantic_models import InputModel
 from utils.logger import logger
 
 def file_append(request:InputModel) -> InputModel:
-    primary_file_name = request.files_and_join_info.primary_file.filename.split('.')[0]
     primary_file = request.files_and_join_info.primary_file
+    primary_file_name = primary_file.file_name.split('.')[0]
     connector = "__"
     for i in range(len(primary_file.join_columns)): #make it for all columns for this file
         primary_file.join_columns[i] =  primary_file_name + connector + primary_file.join_columns[i]
-        # logger.info(primary_file.join_columns[i])
     request.files_and_join_info.primary_file = primary_file 
-    # logger.info(primary_file)
-    # logger.info(request.files_and_join_info.primary_file)
 
-    logger.info('Primary file append is done.')
     secondary_files = request.files_and_join_info.secondary_files
     if secondary_files is not None:
         for i in secondary_files:
@@ -32,7 +28,7 @@ def file_append(request:InputModel) -> InputModel:
             filename = i.file_name.split('.')[0]
             if i.convert_condition is not None:
                 i.convert_condition.column_name = filename + connector +i.convert_condition.column_name
-                logger.easyPrint(i.convert_condition.column_name)
+                # logger.easyPrint(i.convert_condition.column_name)
             expression = i.conditions.expressions
             for j in range(len(expression)):
                 expression[j] = filename + connector +expression[j]

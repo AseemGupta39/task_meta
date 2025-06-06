@@ -3,3 +3,4 @@
 .env
 data/
 utils/file_generator.py
+config/

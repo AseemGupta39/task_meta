@@ -7,7 +7,7 @@ from utils.path_util import getFullOutputPath
 from utils.logger import logger
 from utils.fileNameAppender import file_append
 import time
-
+from utils.sql_parser import get_things_from_sql_drive_statement
 router = APIRouter()
 
 @router.post("/process")
@@ -16,8 +16,16 @@ def process_files(request: InputModel):
         try:
             request = file_append(request)
             file_read_start_time = time.time()
-            primary_file = request.files_and_join_info.primary_file.filename
-            df_map = {primary_file:createDataframe(primary_file) }
+            primary_file = request.files_and_join_info.primary_file
+            primary_file_name = primary_file.file_name
+            df_map = {primary_file_name:createDataframe(primary_file_name) }
+            # logger.easyPrint(f" value print hogi ki nahi : {primary_file.derived_columns}")
+            if primary_file.derived_columns:
+                logger.easyPrint("Prtinting derived  columns ")
+                logger.easyPrint(primary_file.derived_columns)
+                # for stmt in primary_file.derived_columns:
+                #     logger.easyPrint(f"stmt is => {stmt}")
+                #     get_things_from_sql_drive_statement(stmt)
             if request.files_and_join_info.secondary_files:
                 for secondary_file_details in request.files_and_join_info.secondary_files:
                     df_map[secondary_file_details.file_name] = createDataframe(secondary_file_details.file_name)

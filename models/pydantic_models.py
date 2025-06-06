@@ -3,14 +3,22 @@ from pydantic import BaseModel, Field, model_validator
 from utils.constants import replacements
 from utils.date_validator import extract_date_tokens
 
-class DerivedColumn:
+class DerivedColumn(BaseModel):
     sql_statement: str
 
-class JoinFile(BaseModel):
-    file_name: str = Field(..., alias="File name")
+    @model_validator(mode='after')
+    def validate_case_statement(self):
+        # Must contain all required keywords
+        required_keywords = ['CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'FROM']
+        for keyword in required_keywords:
+            if keyword not in self.sql_statement.upper():
+                raise ValueError(f"Missing keyword: {keyword}")
+        return self
+
+class PrimaryFile(BaseModel):
+    file_name: str = Field(..., alias="Filename")
     join_columns: List[str] = Field(default_factory=list, alias="Join_columns")
-    join_type: Optional[Literal["inner", "outer", "left", "right"]] = "outer"
-    derived_columns: Optional[List[DerivedColumn]]
+    derived_columns: Optional[List[DerivedColumn]] = None
 
     @model_validator(mode="after")
     def check_join_columns(self):
@@ -20,10 +28,11 @@ class JoinFile(BaseModel):
 
     model_config = {"populate_by_name" : True}
 
-class PrimaryFile(BaseModel):
-    filename: str = Field(..., alias="Filename")
-    join_columns: List[str] = Field(default_factory=list, alias="Join_columns")
-    derived_columns: Optional[List[DerivedColumn]]
+class JoinFile(PrimaryFile):
+    # file_name: str = Field(..., alias="Filename")
+    # join_columns: List[str] = Field(default_factory=list, alias="Join_columns")
+    join_type: Optional[Literal["inner", "full outer", "left", "right"]] = "full outer"
+    # derived_columns: Optional[List[DerivedColumn]]
 
     @model_validator(mode="after")
     def check_join_columns(self):
@@ -92,3 +101,5 @@ class InputModel(BaseModel):
         return self
 
     model_config = {"populate_by_name" : True}
+
+

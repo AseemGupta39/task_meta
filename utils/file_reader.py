@@ -3,6 +3,8 @@ import os
 from utils.path_util import getFullInputPath
 from utils.logger import logger
 
+FILENAME_CONNECTOR = os.getenv('FILENAME_CONNECTOR')
+
 def createDataframe(filename: str) -> pl.DataFrame:
     """
     1. Construct full path from INPUT_DIR + filename.
@@ -31,5 +33,5 @@ def createDataframe(filename: str) -> pl.DataFrame:
         raise ValueError(f"Unsupported file type: {ext}")
 
     # Prefix columns: e.g., "age" → "file.csv__age"
-    prefixed = df.rename({col: f"{filename.split('.')[0]}__{col}" for col in df.columns})
+    prefixed = df.rename({col: f"{filename.split('.')[0]}{FILENAME_CONNECTOR}{col}" for col in df.columns})
     return prefixed

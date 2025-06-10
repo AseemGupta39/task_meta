@@ -13,9 +13,13 @@ from utils.sql_parser import (
     get_things_from_sql_drive_statement,
 )
 from utils.fileNameAppender import generateColumnName
+from dotenv import load_dotenv
+import os
 
 router = APIRouter()
 
+load_dotenv()
+FILENAME_CONNECTOR = os.getenv('FILENAME_CONNECTOR')
 
 @router.post("/process")
 def process_files(request: InputModel):
@@ -37,7 +41,7 @@ def process_files(request: InputModel):
                     df_map[primary_file_name] = add_column_on_given_condition(
                         df_map[primary_file_name],
                         generateColumnName(
-                            primary_file_name, "__", "dc" + str(counter)
+                            primary_file_name.split('.')[0], FILENAME_CONNECTOR, "dc" + str(counter)
                         ),
                         required_values_for_new_column["col_name"],
                         required_values_for_new_column["operator"],
@@ -48,7 +52,7 @@ def process_files(request: InputModel):
                     counter += 1
 
                     # df_map[primary_file_name] = add_column_on_given_condition(df_map[primary_file_name],
-                    # generateColumnName(primary_file_name.split(".")[0],"__","dc" + str(counter)),'data1__id','>',3,'H','L')
+                    # generateColumnName(primary_file_name.split(".")[0],connector,"dc" + str(counter)),'data1__id','>',3,'H','L')
 
             # logger.easyPrint(df_map)
             if request.files_and_join_info.secondary_files:
@@ -68,7 +72,7 @@ def process_files(request: InputModel):
                             df_map[secondary_file_name] = add_column_on_given_condition(
                                 df_map[secondary_file_name],
                                 generateColumnName(
-                                    secondary_file_name, "__", "dc" + str(counter)
+                                    secondary_file_name.split('.')[0], FILENAME_CONNECTOR, "dc" + str(counter)
                                 ),
                                 required_values_for_new_column["col_name"],
                                 required_values_for_new_column["operator"],
@@ -77,7 +81,6 @@ def process_files(request: InputModel):
                                 required_values_for_new_column["else_value"],
                             )
                             counter += 1
-
 
             file_read_end_time = time.time()
             total_file_read_time = file_read_end_time - file_read_start_time

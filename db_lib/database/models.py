@@ -7,7 +7,7 @@ Base = declarative_base()
 
 class YourDataTable(Base):
     """
-    🏛️ ORM Model for your MySQL table.
+    ORM Model for your MySQL table.
     Ensures correct data types mapping from Polars to MySQL,
     especially for DateTime columns.
     """

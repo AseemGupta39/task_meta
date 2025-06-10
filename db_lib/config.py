@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
 class AppConfig:
     """
     ⚙️ Centralized configuration for the application.
@@ -20,5 +21,6 @@ class AppConfig:
     DEFAULT_BATCH_SIZE = int(os.getenv("DEFAULT_BATCH_SIZE", 50000)) # Rows per batch
 
     # Table Name
-    MAIN_TABLE_NAME = "your_main_data_table" # Make sure this matches your desired MySQL table name
+    # MAIN_TABLE_NAME = "your_main_data_table" # Make sure this matches your desired MySQL table name
     # print(DB_DRIVERNAME,DB_HOST,DB_USERNAME,DB_PASSWORD,sep="\n\n\n\n")
+    MAIN_TABLE_NAME = os.environ.get('MAIN_TABLE_NAME')

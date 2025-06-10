@@ -1,17 +1,5 @@
 import polars as pl
 from typing import Any
-# Create a sample DataFrame
-data = {
-    "product": ["Laptop", "Mouse", "Keyboard", "Monitor", "Webcam"],
-    "sales": [120, 45, 80, 150, 30],
-    "region": ["East", "West", "North", "South", "East"]
-}
-df = pl.DataFrame(data)
-
-print("Original DataFrame:")
-print(df)
-print("\n")
-
 
 def add_column_on_given_condition(
     dataframe: pl.DataFrame,
@@ -83,8 +71,3 @@ def add_column_on_given_condition(
     return df_with_new_column
 # Apply the function to our sample DataFrame
 # df_transformed = add_column_on_given_condition(df)
-df_transformed = add_column_on_given_condition(df,'new_col','sales',">",100,"high1","low1")
-
-print("DataFrame with new 'sales_category' column:")
-print(df_transformed)
-print("\n")

@@ -5,7 +5,7 @@
 # from core.interfaces import IDataWriter
 # from core.exceptions import DataWriteError, DataTransformationError
 # from core.utils import rename_polars_columns_for_mysql, convert_datetime_columns
-# from config import AppConfig # To get the table name
+# from db_lib.config import AppConfig # To get the table name
 # from database.models import YourDataTable # To get the table name dynamically
 
 # class MySQLDataWriter(IDataWriter):
@@ -75,11 +75,11 @@ import polars as pl
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from core.interfaces import IDataWriter
-from core.exceptions import DataWriteError, DataTransformationError
-from core.utils import rename_polars_columns_for_mysql, convert_datetime_columns
-from config import AppConfig
-from database.models import YourDataTable # Import the ORM model
+from db_lib.core.interfaces import IDataWriter
+from db_lib.core.exceptions import DataWriteError, DataTransformationError
+from db_lib.core.utils import rename_polars_columns_for_mysql, convert_datetime_columns
+from db_lib.config import AppConfig
+from db_lib.database.models import YourDataTable # Import the ORM model
 
 class MySQLDataWriter(IDataWriter):
     """
@@ -92,9 +92,9 @@ class MySQLDataWriter(IDataWriter):
         self.config = config
         # Define the datetime columns that need conversion
         self.datetime_columns = [
-            'data1__created_at', # Original name in Polars
-            'data2__created_at',
-            'data_in_json__created_at'
+            'data_lakh1__created_at', # Original name in Polars
+            'data_lakh2__created_at',
+            'data_lakh3__created_at'
         ]
 
     def write_data(self, df: pl.DataFrame, table_name: str, batch_size: int = None):
@@ -128,11 +128,17 @@ class MySQLDataWriter(IDataWriter):
         # Use a list of column names from the ORM model for dictionary creation order
         # This ensures the dictionary keys match the ORM attributes
         # We exclude 'id' as it's auto-incrementing and not in the source DataFrame
+        # orm_column_names = [
+        #     'data1_id', 'data1_value1', 'data1_created_at', 'data1_dc1', 'data1_dc2',
+        #     'data2_roll', 'data2_value1', 'data2_created_at',
+        #     'data_in_json_un', 'data_in_json_unval', 'data_in_json_created_at',
+        #     'Message'
+        # ]
+
         orm_column_names = [
-            'data1_id', 'data1_value1', 'data1_created_at', 'data1_dc1', 'data1_dc2',
-            'data2_roll', 'data2_value1', 'data2_created_at',
-            'data_in_json_un', 'data_in_json_unval', 'data_in_json_created_at',
-            'Message'
+            'data1_name', 'data1_value', 'data1_created_at', 'data1_dc1', 'data2_name', 
+            'data2_value', 'data2_created_at', 'data2_dc1', 'data3_name','data3_value',
+            'data3_created_at','data3_dc1'
         ]
 
         # Use Polars' iter_slices for efficient chunking without converting to Pandas upfront
@@ -151,7 +157,12 @@ class MySQLDataWriter(IDataWriter):
                 try:
                     # Create an ORM object, unpacking the dictionary.
                     # Ensure 'id' is NOT in row_dict as it's auto-incrementing.
-                    orm_objects.append(YourDataTable(**{k: row_dict[k] for k in orm_column_names}))
+                    
+                    # orm_objects.append(YourDataTable(**{k: row_dict[k] for k in orm_column_names}))
+                    dict1 = {k: row_dict[k] for k in orm_column_names}
+                    dict2 = {"Message":"date is"}
+                    dict1.update(dict2)
+                    orm_objects.append(YourDataTable(**dict1))
                 except Exception as e:
                     print(f"⚠️ Warning: Could not create ORM object for row {row_dict}. Skipping. Error: {e}")
                     # You might want more sophisticated error handling here, e.g., logging bad rows
@@ -163,7 +174,7 @@ class MySQLDataWriter(IDataWriter):
 
             session:Session = self.session_maker()
             try:
-                session.add()
+                # session.add()
                 session.bulk_save_objects(orm_objects) # Efficiently save objects in bulk
                 session.commit() # Commit the batch
                 current_row += len(orm_objects)

@@ -1,5 +1,5 @@
 import polars as pl
-from config import AppConfig
+from db_lib.config import AppConfig
 from database.connection import DatabaseConnection
 from database.models import create_tables, YourDataTable
 from database.writer import MySQLDataWriter

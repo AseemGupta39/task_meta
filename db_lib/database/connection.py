@@ -3,8 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import URL
 from sqlalchemy.exc import SQLAlchemyError
-from config import AppConfig
-from core.exceptions import DatabaseConnectionError
+from db_lib.config import AppConfig
+from db_lib.core.exceptions import DatabaseConnectionError
 
 class DatabaseConnection:
     """

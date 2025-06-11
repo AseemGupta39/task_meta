@@ -1,5 +1,6 @@
 import polars as pl
 from typing import Dict
+from utils.logger import logger
 
 def rename_polars_columns_for_mysql(df: pl.DataFrame) -> pl.DataFrame:
     """
@@ -11,22 +12,30 @@ def rename_polars_columns_for_mysql(df: pl.DataFrame) -> pl.DataFrame:
     
     # Define a mapping for explicit renames
     column_mapping = {
-        'data1__id': 'data1_id',
-        'data1__value1': 'data1_value1',
-        'data1__created_at': 'data1_created_at',
-        'data1__dc1': 'data1_dc1',
-        'data1__dc2': 'data1_dc2',
-        'data2__roll': 'data2_roll',
-        'data2__value1': 'data2_value1',
-        'data2__created_at': 'data2_created_at',
-        'data_in_json__un': 'data_in_json_un',
-        'data_in_json__unval': 'data_in_json_unval',
-        'data_in_json__created_at': 'data_in_json_created_at',
-        'Message': 'Message' # Keep as is, or rename if desired
+        'data_lakh1__name': 'data1_name',
+        'data_lakh1__value': 'data1_value',
+        'data_lakh1__created_at': 'data1_created_at',
+        'data_lakh1__dc1': 'data1_dc1',
+        # 'data_lakh1__dc2': 'data1_dc2',
+        
+        'data_lakh2__name': 'data2_name',
+        'data_lakh2__value': 'data2_value',
+        'data_lakh2__created_at': 'data2_created_at',
+        'data_lakh2__dc1': 'data2_dc1',
+        
+        'data_lakh3__name': 'data3_name',
+        'data_lakh3__value': 'data3_value',
+        'data_lakh3__created_at': 'data3_created_at',
+        'data_lakh3__dc1': 'data3_dc1',
+        # 'Message': 'Message' # Keep as is, or rename if desired
     }
 
     # Ensure all expected columns are present before renaming
     missing_columns = [col for col in column_mapping.keys() if col not in df.columns]
+    # logger.easyPrint("Printing cols")
+    # logger.easyPrint(missing_columns)
+    # logger.easyPrint(df.columns)
+    # logger.easyPrint(column_mapping.keys())
     if missing_columns:
         raise ValueError(f"❌ Missing expected columns in DataFrame: {missing_columns}. Please check your input DataFrame schema.")
 

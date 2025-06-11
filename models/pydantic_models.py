@@ -31,7 +31,7 @@ class PrimaryFile(BaseModel):
 class JoinFile(PrimaryFile):
     # file_name: str = Field(..., alias="Filename")
     # join_columns: List[str] = Field(default_factory=list, alias="Join_columns")
-    join_type: Optional[Literal["inner", "full outer", "left", "right"]] = "full outer"
+    join_type: Optional[Literal["inner", "full outer", "left", "reverse left"]] = "full outer"
     # derived_columns: Optional[List[DerivedColumn]]
 
     @model_validator(mode="after")

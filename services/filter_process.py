@@ -48,6 +48,9 @@ def convertDatetimeColumn(df: pl.DataFrame, convert_condition: ConvertCondition)
     # Step 1: Infer original format from the first row
     example_value = df[column][0]
     original_format = infer_format_from_string(example_value)
+    random_format = infer_format_from_string("2023/12/23")
+    logger.easyPrint(random_format)
+    logger.easyPrint(original_format)
     if not original_format:
         raise ValueError(f"Could not infer original format from value: {example_value}")
 
@@ -70,7 +73,6 @@ def convertDatetimeColumn(df: pl.DataFrame, convert_condition: ConvertCondition)
         raise
 
     return df
-
 
 def infer_format_from_string(date_str: str) -> str:
     """
@@ -97,7 +99,6 @@ def convert_to_python_strftime(custom_format: str) -> str:
         python_format = python_format.replace(key, val)
 
     return python_format
-
 
 def parse_expression(expr: str) -> pl.Expr:
     """

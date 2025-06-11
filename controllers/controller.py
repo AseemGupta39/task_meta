@@ -8,9 +8,9 @@ from utils.logger import logger
 from utils.fileNameAppender import file_append
 from utils.column_adder import add_column_on_given_condition
 import time
+import sqlalchemy
 from utils.sql_parser import (
-    parse_sql_case_statement,
-    get_things_from_sql_drive_statement,
+    parse_sql_case_statement
 )
 from utils.fileNameAppender import generateColumnName
 from dotenv import load_dotenv
@@ -126,7 +126,8 @@ def process_files(request: InputModel):
                 file_join_end_time = time.time()
                 total_file_join_time = file_join_end_time - file_join_start_time
                 logger.info(f"Time taken to join the file: {total_file_join_time}")
-                final_processed_df.collect().write_csv(getFullOutputPath())
+                final_processed_df = final_processed_df.collect()
+                final_processed_df.write_csv(getFullOutputPath())
 
             else:
                 final_processed_df = df_map[primary_file]
@@ -135,7 +136,54 @@ def process_files(request: InputModel):
         except Exception as e:
             logger.error(f"Error occurred during joining the file: {e}")
             raise HTTPException(status_code=404, detail=str(e))
+
         # message need to be added here before iteratilevely
+        from db_lib.database.writer import MySQLDataWriter
+        from db_lib.config import AppConfig
+        from db_lib.database.connection import DatabaseConnection,DatabaseConnectionError
+        from db_lib.core.exceptions import DatabaseConnectionError,DataTransformationError,DataWriteError
+        from db_lib.database.models import create_tables
+        # engine = db_conn.get_engine()
+        # Session = db_conn.get_session_maker()
+
+        # database_connection = MySQLDataWriter()
+        # database_connection.write_data(final_processed_df)
+
+        app_config = AppConfig()
+
+    # 2. Setup database connection
+        db_conn = DatabaseConnection(app_config)
+        try:
+            engine = db_conn.get_engine()
+            Session = db_conn.get_session_maker()
+        except DatabaseConnectionError as e:
+            print(f"🔴 Fatal Error: {e}")
+            # sys.exit(1) # Exit if database connection fails
+
+        # 3. Create tables if they don't exist
+        try:
+            create_tables(engine)
+        except Exception as e: # Catch any exception from create_tables
+            print(f"🔴 Fatal Error: Could not create tables: {e}")
+            # sys.exit(1)
+
+        # 5. Initialize the data writer with the specific implementation
+        data_writer = MySQLDataWriter(engine, Session, app_config)
+
+        # 6. Write the DataFrame to MySQL
+        try:
+            data_writer.write_data(
+                df=final_processed_df,
+                table_name=app_config.MAIN_TABLE_NAME,
+            )
+            print("\n🎉 Process completed successfully! Data loaded to MySQL. 🎉")
+        except (DataTransformationError, DataWriteError) as e:
+            print(f"🔴 Error during data write operation: {e}")
+            # sys.exit(1) # Exit if data writing fails
+        except Exception as e:
+            print(f"🔴 An unexpected error occurred: {e}")
+            # sys.exit(1)
+
 
         return {"message": getFullOutputPath()}
     except Exception as e:

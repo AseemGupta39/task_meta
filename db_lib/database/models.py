@@ -1,7 +1,7 @@
 from sqlalchemy import Column, BigInteger, String, Text, DateTime, Integer
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.exc import SQLAlchemyError
-from config import AppConfig
+from db_lib.config import AppConfig
 
 Base = declarative_base()
 
@@ -17,20 +17,22 @@ class YourDataTable(Base):
     # This column will auto-increment and serve as the primary key
     id = Column(BigInteger, primary_key=True, autoincrement=True) # ✨ NEW SYNTHETIC PK
 
-    # Mapping Polars Int64 to MySQL BIGINT
-    data1_id = Column(BigInteger) # No longer the primary key
-    data1_value1 = Column(BigInteger)
+    data1_name = Column(String(255)) # No longer the primary key
+    data1_value = Column(BigInteger)
     data1_created_at = Column(DateTime) # ✨ Mapped to MySQL DATETIME
     data1_dc1 = Column(String(255))
-    data1_dc2 = Column(String(255))
+    # data1_dc2 = Column(String(255))
 
-    data2_roll = Column(BigInteger)
-    data2_value1 = Column(BigInteger)
+    data2_name = Column(String(255))
+    data2_value = Column(BigInteger)
     data2_created_at = Column(DateTime) # ✨ Mapped to MySQL DATETIME
+    data2_dc1 = Column(String(255))
 
-    data_in_json_un = Column(BigInteger)
-    data_in_json_unval = Column(String(255))
-    data_in_json_created_at = Column(DateTime) # ✨ Mapped to MySQL DATETIME
+    data3_name = Column(String(255))
+    data3_value = Column(BigInteger)
+    data3_created_at = Column(DateTime) # ✨ Mapped to MySQL DATETIME
+    data3_dc1 = Column(String(255))
+
     Message = Column(Text) # Mapping to TEXT for potentially long messages
 
     def __repr__(self):
